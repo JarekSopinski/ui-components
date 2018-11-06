@@ -8,6 +8,7 @@ const $accordionItemsIconsDown = $('.accordion-item__icon-down');
 function handleAccordion(){
 
   const paddingTopAndBottom = 40;
+  const transitionDuration = 1000;
   const hiddenClass = 'hidden';
 
   // initially open the first one
@@ -28,36 +29,47 @@ function handleAccordion(){
    // control opening-closing on click
    $accordionItems.each(function(){
 
-  const thisTop = $(this).find($accordionItemsTops);
-  const thisBottom = $(this).find($accordionItemsBottoms);
-  const thisAccordionItemsIconRight = $(this).find($accordionItemsIconsRight);
-  const thisAccordionItemsIconDown = $(this).find($accordionItemsIconsDown);
+        const thisAccordion = $(this);
+        const thisTop = thisAccordion.find($accordionItemsTops);
+        const thisBottom = thisAccordion.find($accordionItemsBottoms);
+        const thisAccordionItemsIconRight = thisAccordion.find($accordionItemsIconsRight);
+        const thisAccordionItemsIconDown = thisAccordion.find($accordionItemsIconsDown);
 
-  // calculate height based on content's height - including padding
-  const thisBottomContainer = $(this).find($accordionItemsBottomsContainers);
-  const thisBottomContainerHeight = thisBottomContainer.height() + paddingTopAndBottom;
+        // calculate height based on content's height - including padding
+        const thisBottomContainer = thisAccordion.find($accordionItemsBottomsContainers);
+        const thisBottomContainerHeight = thisBottomContainer.height() + paddingTopAndBottom;
 
-            thisTop.on('click', () => {
+        const openBottom = () => {
+          thisBottom
+          .addClass('opened')
+          .css({'height': thisBottomContainerHeight});
+          thisAccordionItemsIconRight.addClass(hiddenClass);
+          thisAccordionItemsIconDown.removeClass(hiddenClass);
+          // add bottom border on last element
+          if ( thisAccordion.is(':last-child') ) {
+              thisBottom.css({'border-bottom': '1px solid rgb(112,112,112)'})
+          }  
+        }
+    
+        const closeBottom = () => {
+          thisBottom
+          .removeClass('opened')
+          .css({'height': 0});
+          thisAccordionItemsIconRight.removeClass(hiddenClass);
+          thisAccordionItemsIconDown.addClass(hiddenClass);
+        
+          // remove border on last item after transistion is finished:
+          if ( thisAccordion.is(':last-child') ) {
+              setTimeout(() => {
+                  thisBottom.css({'border-bottom': '0'})
+              }, transitionDuration)
+          }
+        }
+    
+        thisTop.on('click', () => !thisBottom.hasClass('opened') ? openBottom() : closeBottom() )
 
-                if (!thisBottom.hasClass('opened')) {
-                    thisBottom
-                        .addClass('opened')
-                        .css({'height': thisBottomContainerHeight});
-                    thisAccordionItemsIconRight.addClass(hiddenClass);
-                    thisAccordionItemsIconDown.removeClass(hiddenClass);
+    }) // each end
 
-                } else {
-                    thisBottom
-                        .removeClass('opened')
-                        .css({'height': 0});
-                    thisAccordionItemsIconRight.removeClass(hiddenClass);
-                    thisAccordionItemsIconDown.addClass(hiddenClass);
-                }
-                
-            })
-
-        })
-
-    };
+};
 
 handleAccordion();
